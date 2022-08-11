@@ -2,10 +2,9 @@
 
 ### Personal Background
 
-Graham Hamblin
-ham20052@byui.edu
+I have completed Math 425 (Applied Linear Regression), CSE 450 (Machine Learning), and am currently enrolled in Math 488 (Consulting).  Upon graduating in December, I hope to find work related to education or government projects and look forward to enrolling in a Master's program within the next two years.
 
-I have completed Math 425 (Applied Linear Regression), CSE 450 (Machine Learning), and am currently enrolled in Math 488 (Consulting).  Upon graduating in December, I hope to find work relating to education or government projects and look forward to enrolling in a Master's program within the next two years.
+Email: ham20052@byui.edu
 
 ### Project Background
 
@@ -22,4 +21,3 @@ Beyond building a model to detect spam, I hope to deploy a chrome extension to f
 - Regular Expressions: Identify phone numbers, links, etc. that may be indicative of spam
 - Natural Language Processing: interpret comments and flag content as directed by the user
 - Computer Vision: detect violent or pornographic profile pictures as well as any image that may be used to impersonate another user.
-
