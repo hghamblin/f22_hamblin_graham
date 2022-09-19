@@ -12,7 +12,11 @@ website:
         href: https://github.com/
       - icon: twitter
         href: https://twitter.com
+
 format:
   html:
     theme: flatly
     css: styles.css
+
+execute:
+  freeze: auto
