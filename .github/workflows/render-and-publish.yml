@@ -20,7 +20,6 @@ jobs:
         with:
           to: html
           path: results/blog
-          target: docs
         
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
