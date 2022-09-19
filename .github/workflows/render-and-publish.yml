@@ -9,8 +9,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: "Install Quarto and render"
-        uses: pommevilla/quarto-render@main
+      - name: Render Quarto Project
+        uses: quarto-dev/quarto-actions/render@v2
+        with:
+          to: html
+          path: results/blog
 
       - name: "Deploy to gh-pages"
         uses: peaceiris/actions-gh-pages@v3
