@@ -1,8 +1,7 @@
+name: Render and Publish Quarto
 on:
   push:
     branches: main
-
-name: Quarto Publish
 
 jobs:
   build-deploy:
