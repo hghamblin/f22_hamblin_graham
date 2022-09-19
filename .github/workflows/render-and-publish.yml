@@ -10,10 +10,10 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Publish to GitHub Pages (and render)
-        uses: quarto-dev/quarto-actions/publish@v2
+      - name: Render GitHub
+        uses: quarto-dev/quarto-actions/render@v2
         with:
-          target: main
+          to: html
           path: docs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
