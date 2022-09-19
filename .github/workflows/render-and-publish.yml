@@ -12,10 +12,13 @@ jobs:
         
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
-          
-      - name: Publish to GitHub Pages (and render)
-        uses: quarto-dev/quarto-actions/publish@v2
+        
+      - name: Render Quarto Project
+        uses: quarto-dev/quarto-actions/render@v2
         with:
-          target: master
+          to: html
+          path: results/blog
+          target: docs
+        
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
