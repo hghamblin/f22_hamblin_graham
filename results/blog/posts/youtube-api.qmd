@@ -2,7 +2,7 @@
 title: "Getting Started with the YouTube API"
 author: "Graham Hamblin"
 date: "2022-09-14"
-categories: [Python, API, YouTube, Tutorial]
+categories: [Python, API, YouTube]
 image: "img/youtube_logo_dark.jpg"
 execute:
     eval: false
