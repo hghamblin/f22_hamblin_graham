@@ -12,7 +12,43 @@ execute:
 
 Here is how we can get credentials to use the YouTube API.  Make sure you are logged in to a Google account before getting started.
 
-I'll add some more details about something here.
+### Creating a Google Cloud Project
+
+Let's go to the [Google Developer Console](https://console.cloud.google.com/apis/dashboard) and create a project.
+
+![](img/developer-console.png)
+
+Choose a name for your project and press "Create Project".
+
+![](img/create-project.png)
+
+### Select your Project
+
+Return to your dashboard and make sure you've selected your project - this should happen automatically.
+
+![](img/project-home.png)
+
+### Credentials Page
+
+Click the "Credentials" tab on the side navigation.
+
+![](img/credentials-home.png)
+
+### Generate API Key
+
+Press the "Create Credentials" button at the top of the page.
+
+Select "API Key" from the list of options.
+
+![](img/credentials-menu.png)
+
+Your API Key should be generated in just a few seconds.  This key grants us permission to use Google's APIs
+
+![](img/api-key-created.png)
+
+and in case you forget it, you can find your key here.
+
+![](img/api-key-reference.png)
 
 # Google API Client
 
@@ -23,7 +59,6 @@ To get started, we must import the client and provide the following information:
 - `developerKey`: this is string of characters from before
 
 ```python
-
 import googleapiclient.discovery
 
 youtube = googleapiclient.discovery.build(
@@ -31,41 +66,59 @@ youtube = googleapiclient.discovery.build(
     version = "v3", 
     developerKey = API_KEY # use your credentials from before
 )
-
 ```
 
 # Making Requests
 
+There are only two required parameters when requesting comments from the YouTube API:
+
+- `part`:
+    - `"snippet"`: details about the comment (author, likes, etc.)
+    - `"id"`: unique identifier for the comment
+- `id` or `parentID`: ID for the video or parent comment for which we would like responses.
+
+For this example, we will be requesting the `"snippet"` (details) for comments on a specified video.
+
+I'll be using the following video by 3Blue1Brown, though the process will be identical if you would like to follow along with another video.
+
+<a href="https://www.youtube.com/watch?v=8idr1WZ1A7Q">
+    <img style="display: block; 
+                margin-left: auto; 
+                margin-right: auto;"
+         src="img/3B1B-thumbnail.png">
+</a>
+
+Let's take a look at the URL for this video:
+
+$$
+    \text{https://www.youtube.com/watch?v=}\underbrace{\text{8idr1WZ1A7Q}}_\text{Video ID}
+$$
+
+While we could easily copy the video ID from the URL and paste it directly into our code, I plan to automate this process for a number of videos and would save time by putting this into code.
+
 Let's take the URL of our selected video and extract the ID using the `split()` function.
 
 ```python
-
 # URL of the selected video
 video_url = "https://www.youtube.com/watch?v=8idr1WZ1A7Q"
 
 # extracts the ID from the given URL
 video_id = video_url.split("watch?v=")[1]
-
 ```
 
 Now we have everything we need to define our request.  The following code uses our API client from before to request comments from the YouTube video we selected above.
 
 ```python
-
 request = youtube.commentThreads().list(
-    part = "snippet", 
-    maxResults = 100, 
+    part = "snippet",  
     videoId = video_id
 )
-
 ```
 
 The request is then processed as follows
 
 ```python
-
 request.execute()["items"]
-
 ```
 
 # Interpreting Responses
@@ -73,7 +126,6 @@ request.execute()["items"]
 After processing the request, the API returns a list of elements in the following structure.
 
 ```python
-
 {
     'kind': 'youtube#commentThread',
     'etag': 'CWbEkHqHXRtzPDpMF8Oiy-IJ2i4',
@@ -106,7 +158,6 @@ After processing the request, the API returns a list of elements in the followin
         'isPublic': True
     }
 }
-
 ```
 
 We can load the response into a pandas dataframe 

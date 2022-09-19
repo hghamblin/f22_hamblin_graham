@@ -123,6 +123,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 }</script>
 
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../styles.css">
 </head>
@@ -208,7 +209,33 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="getting-credentials" class="level1">
 <h1>Getting Credentials</h1>
 <p>Here is how we can get credentials to use the YouTube API. Make sure you are logged in to a Google account before getting started.</p>
-<p>I’ll add some more details about something here.</p>
+<section id="creating-a-google-cloud-project" class="level3">
+<h3 class="anchored" data-anchor-id="creating-a-google-cloud-project">Creating a Google Cloud Project</h3>
+<p>Let’s go to the <a href="https://console.cloud.google.com/apis/dashboard">Google Developer Console</a> and create a project.</p>
+<p><img src="img/developer-console.png" class="img-fluid"></p>
+<p>Choose a name for your project and press “Create Project”.</p>
+<p><img src="img/create-project.png" class="img-fluid"></p>
+</section>
+<section id="select-your-project" class="level3">
+<h3 class="anchored" data-anchor-id="select-your-project">Select your Project</h3>
+<p>Return to your dashboard and make sure you’ve selected your project - this should happen automatically.</p>
+<p><img src="img/project-home.png" class="img-fluid"></p>
+</section>
+<section id="credentials-page" class="level3">
+<h3 class="anchored" data-anchor-id="credentials-page">Credentials Page</h3>
+<p>Click the “Credentials” tab on the side navigation.</p>
+<p><img src="img/credentials-home.png" class="img-fluid"></p>
+</section>
+<section id="generate-api-key" class="level3">
+<h3 class="anchored" data-anchor-id="generate-api-key">Generate API Key</h3>
+<p>Press the “Create Credentials” button at the top of the page.</p>
+<p>Select “API Key” from the list of options.</p>
+<p><img src="img/credentials-menu.png" class="img-fluid"></p>
+<p>Your API Key should be generated in just a few seconds. This key grants us permission to use Google’s APIs</p>
+<p><img src="img/api-key-created.png" class="img-fluid"></p>
+<p>and in case you forget it, you can find your key here.</p>
+<p><img src="img/api-key-reference.png" class="img-fluid"></p>
+</section>
 </section>
 <section id="google-api-client" class="level1">
 <h1>Google API Client</h1>
@@ -218,71 +245,84 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><code>version</code>: v3 is the most up-to-date as of publishing</li>
 <li><code>developerKey</code>: this is string of characters from before</li>
 </ul>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> googleapiclient.discovery</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>youtube <span class="op">=</span> googleapiclient.discovery.build(</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    serviceName <span class="op">=</span> <span class="st">"youtube"</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    version <span class="op">=</span> <span class="st">"v3"</span>, </span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    developerKey <span class="op">=</span> API_KEY <span class="co"># use your credentials from before</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> googleapiclient.discovery</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>youtube <span class="op">=</span> googleapiclient.discovery.build(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    serviceName <span class="op">=</span> <span class="st">"youtube"</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    version <span class="op">=</span> <span class="st">"v3"</span>, </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    developerKey <span class="op">=</span> API_KEY <span class="co"># use your credentials from before</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="making-requests" class="level1">
 <h1>Making Requests</h1>
+<p>There are only two required parameters when requesting comments from the YouTube API:</p>
+<ul>
+<li><code>part</code>:
+<ul>
+<li><code>"snippet"</code>: details about the comment (author, likes, etc.)</li>
+<li><code>"id"</code>: unique identifier for the comment</li>
+</ul></li>
+<li><code>id</code> or <code>parentID</code>: ID for the video or parent comment for which we would like responses.</li>
+</ul>
+<p>For this example, we will be requesting the <code>"snippet"</code> (details) for comments on a specified video.</p>
+<p>I’ll be using the following video by 3Blue1Brown, though the process will be identical if you would like to follow along with another video.</p>
+<p><a href="https://www.youtube.com/watch?v=8idr1WZ1A7Q"> <img style="display: block; 
+                margin-left: auto; 
+                margin-right: auto;" src="img/3B1B-thumbnail.png"> </a></p>
+<p>Let’s take a look at the URL for this video:</p>
+<p><span class="math display">\[
+    \text{https://www.youtube.com/watch?v=}\underbrace{\text{8idr1WZ1A7Q}}_\text{Video ID}
+\]</span></p>
+<p>While we could easily copy the video ID from the URL and paste it directly into our code, I plan to automate this process for a number of videos and would save time by putting this into code.</p>
 <p>Let’s take the URL of our selected video and extract the ID using the <code>split()</code> function.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># URL of the selected video</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>video_url <span class="op">=</span> <span class="st">"https://www.youtube.com/watch?v=8idr1WZ1A7Q"</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># extracts the ID from the given URL</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>video_id <span class="op">=</span> video_url.split(<span class="st">"watch?v="</span>)[<span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># URL of the selected video</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>video_url <span class="op">=</span> <span class="st">"https://www.youtube.com/watch?v=8idr1WZ1A7Q"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># extracts the ID from the given URL</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>video_id <span class="op">=</span> video_url.split(<span class="st">"watch?v="</span>)[<span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Now we have everything we need to define our request. The following code uses our API client from before to request comments from the YouTube video we selected above.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>request <span class="op">=</span> youtube.commentThreads().<span class="bu">list</span>(</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    part <span class="op">=</span> <span class="st">"snippet"</span>, </span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    maxResults <span class="op">=</span> <span class="dv">100</span>, </span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    videoId <span class="op">=</span> video_id</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>request <span class="op">=</span> youtube.commentThreads().<span class="bu">list</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    part <span class="op">=</span> <span class="st">"snippet"</span>,  </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    videoId <span class="op">=</span> video_id</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The request is then processed as follows</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>request.execute()[<span class="st">"items"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>request.execute()[<span class="st">"items"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="interpreting-responses" class="level1">
 <h1>Interpreting Responses</h1>
 <p>After processing the request, the API returns a list of elements in the following structure.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>{</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'kind'</span>: <span class="st">'youtube#commentThread'</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'etag'</span>: <span class="st">'CWbEkHqHXRtzPDpMF8Oiy-IJ2i4'</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'id'</span>: <span class="st">'Ugx5qRkWFxUWVad4dNF4AaABAg'</span>,</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'snippet'</span>: {</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'videoId'</span>: <span class="st">'8idr1WZ1A7Q'</span>,</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">'topLevelComment'</span>: {</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">'kind'</span>: <span class="st">'youtube#comment'</span>,</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">'etag'</span>: <span class="st">'LeBHFSGXBuJ9_wl3QGeF04Qc714'</span>,</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">'id'</span>: <span class="st">'Ugx5qRkWFxUWVad4dNF4AaABAg'</span>,</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">'snippet'</span>: {</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>                <span class="st">'videoId'</span>: <span class="st">'8idr1WZ1A7Q'</span>,</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>                <span class="st">'textDisplay'</span>: <span class="st">'&lt;a href="https://www.youtube.com/watch?v=8idr1WZ1A7Q&amp;amp;t=5m30s"&gt;5:30&lt;/a&gt; Nikola lol'</span>,</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>                <span class="st">'textOriginal'</span>: <span class="st">'5:30 Nikola lol'</span>,</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>                <span class="st">'authorDisplayName'</span>: <span class="st">'A Human'</span>,</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>                <span class="st">'authorProfileImageUrl'</span>: <span class="st">'https://yt3.ggpht.com/eXPf7FrnH0vv0zrcl8foRNtYC3fFb1Kmjb-N528k00lLOk21sNbBBxTsY4q3ZhrvAXGDYt25NjE=s48-c-k-c0x00ffffff-no-rj'</span>,</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>                <span class="st">'authorChannelUrl'</span>: <span class="st">'http://www.youtube.com/channel/UCfRur4T6f8Lb3_STxB8AotQ'</span>,</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>                <span class="st">'authorChannelId'</span>: {</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>                    <span class="st">'value'</span>: <span class="st">'UCfRur4T6f8Lb3_STxB8AotQ'</span></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>                },</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>                <span class="st">'canRate'</span>: <span class="va">True</span>,</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>                <span class="st">'viewerRating'</span>: <span class="st">'none'</span>,</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>                <span class="st">'likeCount'</span>: <span class="dv">0</span>,</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>                <span class="st">'publishedAt'</span>: <span class="st">'2022-09-13T03:04:25Z'</span>,</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>                <span class="st">'updatedAt'</span>: <span class="st">'2022-09-13T03:04:25Z'</span></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>            }</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>        },</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>        <span class="st">'canReply'</span>: <span class="va">True</span>,</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>        <span class="st">'totalReplyCount'</span>: <span class="dv">0</span>,</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>        <span class="st">'isPublic'</span>: <span class="va">True</span></span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'kind'</span>: <span class="st">'youtube#commentThread'</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'etag'</span>: <span class="st">'CWbEkHqHXRtzPDpMF8Oiy-IJ2i4'</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'id'</span>: <span class="st">'Ugx5qRkWFxUWVad4dNF4AaABAg'</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'snippet'</span>: {</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">'videoId'</span>: <span class="st">'8idr1WZ1A7Q'</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'topLevelComment'</span>: {</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">'kind'</span>: <span class="st">'youtube#comment'</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">'etag'</span>: <span class="st">'LeBHFSGXBuJ9_wl3QGeF04Qc714'</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">'id'</span>: <span class="st">'Ugx5qRkWFxUWVad4dNF4AaABAg'</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">'snippet'</span>: {</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>                <span class="st">'videoId'</span>: <span class="st">'8idr1WZ1A7Q'</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>                <span class="st">'textDisplay'</span>: <span class="st">'&lt;a href="https://www.youtube.com/watch?v=8idr1WZ1A7Q&amp;amp;t=5m30s"&gt;5:30&lt;/a&gt; Nikola lol'</span>,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>                <span class="st">'textOriginal'</span>: <span class="st">'5:30 Nikola lol'</span>,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>                <span class="st">'authorDisplayName'</span>: <span class="st">'A Human'</span>,</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>                <span class="st">'authorProfileImageUrl'</span>: <span class="st">'https://yt3.ggpht.com/eXPf7FrnH0vv0zrcl8foRNtYC3fFb1Kmjb-N528k00lLOk21sNbBBxTsY4q3ZhrvAXGDYt25NjE=s48-c-k-c0x00ffffff-no-rj'</span>,</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>                <span class="st">'authorChannelUrl'</span>: <span class="st">'http://www.youtube.com/channel/UCfRur4T6f8Lb3_STxB8AotQ'</span>,</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>                <span class="st">'authorChannelId'</span>: {</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>                    <span class="st">'value'</span>: <span class="st">'UCfRur4T6f8Lb3_STxB8AotQ'</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>                },</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>                <span class="st">'canRate'</span>: <span class="va">True</span>,</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>                <span class="st">'viewerRating'</span>: <span class="st">'none'</span>,</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>                <span class="st">'likeCount'</span>: <span class="dv">0</span>,</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>                <span class="st">'publishedAt'</span>: <span class="st">'2022-09-13T03:04:25Z'</span>,</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>                <span class="st">'updatedAt'</span>: <span class="st">'2022-09-13T03:04:25Z'</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>        <span class="st">'canReply'</span>: <span class="va">True</span>,</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>        <span class="st">'totalReplyCount'</span>: <span class="dv">0</span>,</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>        <span class="st">'isPublic'</span>: <span class="va">True</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>We can load the response into a pandas dataframe</p>
 <p>Let’s take a look at the first few rows of our data.</p>
 <table class="table">

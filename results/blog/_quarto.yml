@@ -1,6 +1,6 @@
 project:
   type: website
-  output-dir: docs
+  output-dir: ../../docs
 
 website:
   title: "Graham Hamblin's Blog"
@@ -16,4 +16,3 @@ format:
   html:
     theme: flatly
     css: styles.css
-    
