@@ -1,23 +1,21 @@
 name: Render and deploy Quarto files
 on:
   push:
-  pull_request:
-
+  pull_request:    
+    
 jobs:
-  quarto-render-and-deploy:
+  build-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Render Quarto Project
-        uses: quarto-dev/quarto-actions/render@v2
+      - name: Check out repository
+        uses: actions/checkout@v3
+        
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+          
+      - name: Publish to GitHub Pages (and render)
+        uses: quarto-dev/quarto-actions/publish@v2
         with:
-          to: html
-          path: results/blog
-
-      - name: "Deploy to gh-pages"
-        uses: peaceiris/actions-gh-pages@v3
-        if: github.ref == 'refs/heads/main'
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./_site
+          target: master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
